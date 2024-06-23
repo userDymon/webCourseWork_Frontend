@@ -1,21 +1,20 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-
 import { Post } from "../components/Post";
 import { Index } from "../components/AddComment";
 import { CommentsBlock } from "../components/CommentsBlock";
 import axios from "axios";
 
 export const FullPost = () => {
-
   const [data, setData] = React.useState();
   const [isLoading, setLoading] = React.useState(true);
-  const {id} = useParams();
+  const { id } = useParams();
 
   React.useEffect(() => {
     const fetchPost = async () => {
       try {
         const res = await axios.get(`/posts/${id}`);
+        console.log('Response data:', res.data); // Додайте це логування
         setData(res.data);
         setLoading(false);
       } catch (err) {
@@ -24,12 +23,13 @@ export const FullPost = () => {
         setLoading(false);
       }
     };
+    
 
     fetchPost();
   }, [id]);
 
   if (isLoading) {
-    return <Post isLoading={isLoading} isFullPost={true}/>;
+    return <Post isLoading={isLoading} isFullPost={true} />;
   }
 
   return (
