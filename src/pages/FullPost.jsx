@@ -6,30 +6,40 @@ import { CommentsBlock } from "../components/CommentsBlock";
 import axios from "axios";
 
 export const FullPost = () => {
-  const [data, setData] = React.useState();
+  const [data, setData] = React.useState(null);
   const [isLoading, setLoading] = React.useState(true);
   const { id } = useParams();
 
   React.useEffect(() => {
     const fetchPost = async () => {
       try {
-        const res = await axios.get(`/posts/${id}`);
-        console.log('Response data:', res.data); // Додайте це логування
-        setData(res.data);
-        setLoading(false);
+        console.log('Fetching post with id:', id); // Логування ідентифікатора поста
+        const res = await axios.get(`http://localhost:4444/posts/${id}`); // Перевірка правильності URL
+        console.log('Response:', res); // Логування повної відповіді
+        if (res.status === 200) {
+          console.log('Response data:', res.data); // Логування даних відповіді
+          setData(res.data);
+        } else {
+          console.warn('Error status:', res.status);
+          alert('Error fetching post');
+        }
       } catch (err) {
-        console.warn(err);
+        console.warn('Fetch error:', err);
         alert('Error fetching post');
+      } finally {
         setLoading(false);
       }
     };
-    
 
     fetchPost();
   }, [id]);
 
   if (isLoading) {
     return <Post isLoading={isLoading} isFullPost={true} />;
+  }
+
+  if (!data) {
+    return <div>Post not found</div>;
   }
 
   return (
@@ -45,9 +55,7 @@ export const FullPost = () => {
         tags={data.tags}
         isFullPost
       >
-        <p>
-          {data.text}
-        </p>
+        <p>{data.text}</p>
       </Post>
       <CommentsBlock
         items={[
