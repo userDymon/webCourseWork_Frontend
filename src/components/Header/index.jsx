@@ -4,6 +4,8 @@ import Button from '@mui/material/Button';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/auth';
 
+import { Navigate } from 'react-router-dom';
+
 import styles from './Header.module.scss';
 import Container from '@mui/material/Container';
 import { useSelector } from 'react-redux';
@@ -30,7 +32,7 @@ export const Header = () => {
           <div className={styles.buttons}>
             {isAuth ? (
               <>
-                <Link to="/posts/create">
+                <Link to="/add-post">
                   <Button variant="contained">Write an article</Button>
                 </Link>
                 <Button onClick={onClickLogout} variant="contained" color="error">

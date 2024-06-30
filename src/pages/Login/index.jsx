@@ -16,7 +16,6 @@ export const Login = () => {
   const { 
     register, 
     handleSubmit, 
-    setError, 
     formState: { errors, isValid },
   } = useForm({
     defaultValues: {
@@ -37,12 +36,6 @@ export const Login = () => {
       window.localStorage.setItem('token', data.payload.token);
     }
   };
-
-  React.useEffect(() => {
-    if (isAuth) {
-      <Navigate to="/" />;
-    }
-  }, [isAuth]);
 
   if (isAuth) {
     return <Navigate to="/" />;
@@ -72,7 +65,7 @@ export const Login = () => {
           {...register("password", { required: "Specify password" })} 
           fullWidth 
         />
-        <Button size="large" type="submit" variant="contained" fullWidth>
+        <Button disabled={!isValid} size="large" type="submit" variant="contained" fullWidth>
           Log in
         </Button>
       </form>
