@@ -69,7 +69,7 @@ export const Post = ({
           <ul className={styles.tags}>
             {tags.map((name) => (
               <li key={name}>
-                <Link to={`/tag/${name}`}>#{name}</Link>
+                #{name}
               </li>
             ))}
           </ul>
@@ -78,10 +78,6 @@ export const Post = ({
             <li>
               <EyeIcon />
               <span>{viewsCount}</span>
-            </li>
-            <li>
-              <CommentIcon />
-              <span>{commentsCount}</span>
             </li>
           </ul>
         </div>
