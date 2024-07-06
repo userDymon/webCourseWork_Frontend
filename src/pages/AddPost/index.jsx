@@ -1,17 +1,18 @@
 import React from 'react';
+import { useNavigate, Navigate, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import SimpleMDE from 'react-simplemde-editor';
 
 import 'easymde/dist/easymde.min.css';
-import { useNavigate, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import { selectIsAuth } from "../../redux/slices/auth";
 import axios from '../../axios';
 import styles from './AddPost.module.scss';
 
 export const AddPost = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
   const isAuth = useSelector(selectIsAuth);
   const [isLoading, setLoading] = React.useState(false);
@@ -20,6 +21,8 @@ export const AddPost = () => {
   const [tags, setTags] = React.useState('');
   const [imageUrl, setImageUrl] = React.useState('');
   const inputFileRef = React.useRef(null);
+
+  const isEditing = Boolean(id);
 
   const handleChangeFile = async (event) => {
     try {
@@ -57,10 +60,10 @@ export const AddPost = () => {
         text
       };
       console.log('Submitting fields:', fields); // Додано логування полів
-      const { data } = await axios.post('/posts', fields);
+      const { data } = isEditing ? await axios.patch(`/posts/${id}`, fields) : await axios.post('/posts', fields);
       console.log('Response data:', data); // Додано логування відповіді сервера
-      const id = data._id;
-      navigate(`/posts/${id}`);
+      const _id = isEditing ? id : data._id;
+      navigate(`/posts/${_id}`);
     } catch (err) {
       console.warn('Error creating post:', err.response?.data); // Логування помилки
       if (err.response?.data) {
@@ -68,10 +71,25 @@ export const AddPost = () => {
       } else {
         alert('Error creating post');
       }
-    } finally {
-      setLoading(false);
     }
   };
+
+  React.useEffect(() => {
+    if(id){
+      axios
+        .get(`/posts/${id}`)
+        .then(({ data }) => {
+          setTitle(data.title);
+          setText(data.text);
+          setImageUrl(data.imageUrl);
+          setTags(data.tags.join(','));
+        })
+        .catch((err) => {
+          console.warn('Error fetching post:', err);
+          alert('Error fetching post');
+        });
+    }
+  }, []);
 
   const options = React.useMemo(
     () => ({
@@ -127,7 +145,7 @@ export const AddPost = () => {
       <SimpleMDE className={styles.editor} value={text} onChange={onChange} options={options} />
       <div className={styles.buttons}>
         <Button onClick={onSubmit} size="large" variant="contained">
-          Publish
+          {isEditing ? 'Save' : 'Publish'}
         </Button>
         <a href="/">
           <Button size="large">Undo</Button>
